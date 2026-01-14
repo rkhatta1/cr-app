@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   CloudUploadIcon,
@@ -10,6 +11,7 @@ import {
   ArrowRight01Icon,
   CheckmarkCircle02Icon,
   AlertCircleIcon,
+  Loading03Icon,
 } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -39,15 +41,33 @@ const CHARACTER_AVATARS: Record<string, string> = {
 
 export default function UploadPage() {
   const router = useRouter();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
   const { startUpload: startUploadContext } = useUpload();
   const [step, setStep] = useState<UploadStep>(UploadStep.SELECT);
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!isSessionLoading && !session) {
+      router.push('/login');
+    }
+  }, [session, isSessionLoading, router]);
+
   const [deckDesc, setDeckDesc] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState('peter');
   const [characters, setCharacters] = useState<Character[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (isSessionLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
+        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!session) return null;
 
   // Fetch available characters on mount
   useEffect(() => {

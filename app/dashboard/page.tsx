@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authClient } from '@/lib/auth-client';
+import { useEffect } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   Add01Icon,
@@ -34,16 +36,36 @@ function formatDate(dateStr: string): string {
 export default function DashboardPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
 
-  const { data: videos, isLoading, isError } = useQuery<Video[]>({
+  useEffect(() => {
+    if (!isSessionLoading && !session) {
+      router.push('/login');
+    }
+  }, [session, isSessionLoading, router]);
+
+  const { data: videos, isLoading: isVideosLoading, isError } = useQuery<Video[]>({
     queryKey: ['videos'],
     queryFn: async () => {
       const res = await fetch('/api/videos');
       if (!res.ok) throw new Error('Failed to fetch videos');
       return res.json();
     },
-    refetchInterval: 5000, // Poll every 5 seconds for status updates
+    enabled: !!session, // Only fetch if authenticated
+    refetchInterval: 5000,
   });
+
+  if (isSessionLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
+        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!session) return null; // Prevent flash of content before redirect
+
+  const isLoading = isVideosLoading; // Alias for existing code compatibility
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
