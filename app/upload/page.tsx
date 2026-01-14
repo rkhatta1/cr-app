@@ -59,16 +59,6 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (isSessionLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
-        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!session) return null;
-
   // Fetch available characters on mount
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -94,6 +84,16 @@ export default function UploadPage() {
     };
     fetchCharacters();
   }, []);
+
+  if (isSessionLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
+        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!session) return null;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

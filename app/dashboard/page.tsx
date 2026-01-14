@@ -55,18 +55,6 @@ export default function DashboardPage() {
     refetchInterval: 5000,
   });
 
-  if (isSessionLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
-        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!session) return null; // Prevent flash of content before redirect
-
-  const isLoading = isVideosLoading; // Alias for existing code compatibility
-
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await fetch(`/api/videos/${id}`, {
@@ -79,6 +67,18 @@ export default function DashboardPage() {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
     },
   });
+
+  if (isSessionLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-black text-white">
+        <HugeiconsIcon icon={Loading03Icon} size={48} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!session) return null; // Prevent flash of content before redirect
+
+  const isLoading = isVideosLoading; // Alias for existing code compatibility
 
   const handleDelete = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
