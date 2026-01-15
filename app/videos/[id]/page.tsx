@@ -13,7 +13,6 @@ import {
   AlertCircleIcon,
 } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { VideoStatus } from '@/types';
 import { useUpload } from '@/context/UploadContext';
@@ -282,7 +281,6 @@ export default function VideoDetailPage() {
               <h1 className="text-2xl font-bold text-white truncate max-w-md">
                 {video.filename.replace(/\.[^/.]+$/, '')}
               </h1>
-              <StatusBadge status={getVideoStatus()} />
             </div>
             <p className="text-muted-foreground text-sm">
               Created on {new Date(video.created_at).toLocaleDateString()} -{' '}
