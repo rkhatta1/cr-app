@@ -23,11 +23,13 @@ model User {
   email         String?   @unique
   emailVerified Boolean   @default(false)
   image         String?
+  generationsCount Int    @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   accounts      Account[]
   sessions      Session[]
+  refundedVideos RefundedVideo[]
 }
 
 model Account {
@@ -71,4 +73,12 @@ model Verification {
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model RefundedVideo {
+  id        String   @id @default(cuid())
+  videoId   String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }

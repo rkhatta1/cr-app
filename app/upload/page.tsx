@@ -49,6 +49,15 @@ export default function UploadPage() {
   useEffect(() => {
     if (!isSessionLoading && !session) {
       router.push('/login');
+      return;
+    }
+
+    if (!isSessionLoading && session) {
+      const currentCount = session.user.generationsCount ?? 0;
+      if (currentCount >= 2) {
+        console.warn('Access denied: Generation limit reached');
+        router.push('/dashboard');
+      }
     }
   }, [session, isSessionLoading, router]);
 

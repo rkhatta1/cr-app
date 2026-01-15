@@ -38,6 +38,10 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
 
+  const currentCount = session?.user?.generationsCount ?? 0;
+  const generationLimit = 2;
+  const isLimitReached = currentCount >= generationLimit;
+
   useEffect(() => {
     if (!isSessionLoading && !session) {
       router.push('/login');
@@ -94,13 +98,27 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">My Videos</h1>
-            <p className="text-muted-foreground">
-              Manage your generated content and create new roasts.
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground">
+                Manage your generated content.
+              </p>
+              {/* 2. Visual indicator for the generation limit */}
+              <span className={`text-xs font-mono px-2 py-0.5 rounded-none border ${
+                isLimitReached ? 'border-primary text-primary animate-pulse' : 'border-zinc-800 text-zinc-500'
+              }`}>
+                {currentCount}/{generationLimit} GENERATIONS
+              </span>
+            </div>
           </div>
-          <Button onClick={() => router.push('/upload')}>
+          
+          {/* 3. Disable the main action button if limit is reached */}
+          <Button 
+            onClick={() => router.push('/upload')}
+            disabled={isLimitReached}
+            className={isLimitReached ? 'opacity-50' : ''}
+          >
             <HugeiconsIcon icon={Add01Icon} size={16} className="mr-2" />
-            New Video
+            {isLimitReached ? 'Limit Reached' : 'New Video'}
           </Button>
         </div>
 
@@ -207,18 +225,23 @@ export default function DashboardPage() {
 
           {/* Create New Placeholder Card */}
           <button
-            onClick={() => router.push('/upload')}
-            className="border border-dashed border-zinc-800 flex flex-col items-center justify-center gap-4 hover:border-primary/50 hover:bg-zinc-900/30 transition-all group h-full min-h-[250px]"
+            onClick={() => !isLimitReached && router.push('/upload')}
+            disabled={isLimitReached}
+            className={`border border-dashed border-zinc-800 flex flex-col items-center justify-center gap-4 transition-all group h-full min-h-[250px] ${
+              isLimitReached 
+                ? 'opacity-50 grayscale cursor-not-allowed bg-zinc-900/10' 
+                : 'hover:border-primary/50 hover:bg-zinc-900/30 cursor-pointer'
+            }`}
           >
-            <div className="w-12 h-12 bg-zinc-900 flex items-center justify-center group-hover:scale-110 transition-transform border border-zinc-800 group-hover:border-primary/30">
+            <div className="w-12 h-12 bg-zinc-900 flex items-center justify-center group-hover:scale-110 transition-transform border border-zinc-800">
               <HugeiconsIcon
                 icon={Add01Icon}
                 size={24}
-                className="text-zinc-400 group-hover:text-primary"
+                className={isLimitReached ? 'text-zinc-600' : 'text-zinc-400 group-hover:text-primary'}
               />
             </div>
             <span className="text-sm font-medium text-zinc-400 group-hover:text-primary">
-              Create New Project
+              {isLimitReached ? 'Generation Limit Reached' : 'Create New Project'}
             </span>
           </button>
         </div>
