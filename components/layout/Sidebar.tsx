@@ -18,6 +18,10 @@ export function Sidebar() {
   const isActive = (path: string) => pathname === path;
   const { data: session } = authClient.useSession();
 
+  const currentCount = session?.user?.generationsCount ?? 0;
+  const generationLimit = 2;
+  const isLimitReached = currentCount >= generationLimit;
+
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push('/');
@@ -62,8 +66,15 @@ export function Sidebar() {
 
         <Link
           href="/upload"
+          onClick={(e) => {
+            if (isLimitReached) {
+              e.preventDefault();
+            }
+          }}
           className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
-            isActive('/upload')
+            isLimitReached
+              ? 'opacity-50 cursor-not-allowed text-muted-foreground'
+              : isActive('/upload')
               ? 'bg-zinc-800 text-white border border-zinc-700'
               : 'text-muted-foreground hover:text-white hover:bg-zinc-900'
           }`}

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { VideoStatus } from '@/types';
+import { useUpload } from '@/context/UploadContext';
 
 interface VideoData {
   id: number;
@@ -47,7 +48,7 @@ interface ProcessingStep {
   estimatedTime?: string;
 }
 
-function getProcessingSteps(video: VideoData): ProcessingStep[] {
+function getProcessingSteps(video: VideoData, uploadProgress?: number): ProcessingStep[] {
   const status = video.status;
   const batches = video.batches || [];
   const commentary = video.commentary;
@@ -62,7 +63,9 @@ function getProcessingSteps(video: VideoData): ProcessingStep[] {
   const steps: ProcessingStep[] = [
     {
       id: 1,
-      label: 'Upload Complete',
+      label: status === 'uploading' && uploadProgress !== undefined
+        ? `Uploading (${uploadProgress.toFixed(1)}%)`
+        : 'Upload Complete',
       status: status === 'uploading' ? 'active' : 'completed',
     },
     {
@@ -126,10 +129,15 @@ function getProcessingSteps(video: VideoData): ProcessingStep[] {
   return steps;
 }
 
-function calculateProgress(video: VideoData): number {
+function calculateProgress(video: VideoData, uploadProgress?: number): number {
   const status = video.status;
   const batches = video.batches || [];
   const commentary = video.commentary;
+
+  // If video is uploading and we have upload progress from context
+  if (status === 'uploading' && uploadProgress !== undefined) {
+    return Math.min(uploadProgress, 99);
+  }
 
   if (status === 'completed') return 100;
   if (status === 'failed') return 0;
@@ -165,6 +173,8 @@ export default function VideoDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { uploads } = useUpload();
+  const uploadState = uploads[parseInt(id)];
 
   const { data: video, isLoading, error } = useQuery<VideoData>({
     queryKey: ['video', id],
@@ -244,8 +254,9 @@ export default function VideoDetailPage() {
 
   const isCompleted = video.status === 'completed';
   const isFailed = video.status === 'failed';
-  const steps = getProcessingSteps(video);
-  const progress = calculateProgress(video);
+  const isUploading = video.status === 'uploading';
+  const steps = getProcessingSteps(video, uploadState?.progress);
+  const progress = calculateProgress(video, uploadState?.progress);
   const characterName = getCharacterName(video.character || 'peter');
 
   const getVideoStatus = (): VideoStatus => {
@@ -356,9 +367,9 @@ export default function VideoDetailPage() {
                   <div className="w-full max-w-md space-y-4">
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-white font-medium">
-                        Processing Video...
+                        {isUploading ? 'Uploading Video...' : 'Processing Video...'}
                       </span>
-                      <span className="text-primary">{progress}%</span>
+                      <span className="text-primary">{progress.toFixed(1)}%</span>
                     </div>
                     <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                       <div
@@ -366,9 +377,15 @@ export default function VideoDetailPage() {
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <p className="text-muted-foreground text-sm animate-pulse">
-                      {characterName} is analyzing your deck usage...
-                    </p>
+                    {isUploading ? (
+                      <p className="text-muted-foreground text-sm animate-pulse">
+                        Uploading to cloud storage...
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground text-sm animate-pulse">
+                        {characterName} is analyzing your deck usage...
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

@@ -67,7 +67,7 @@ export function StatusBadge({ status, className, showText = true }: StatusBadgeP
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 text-xs font-medium border rounded-none',
+        'inline-flex items-center text-xs font-medium rounded-none',
         styles[status],
         className
       )}

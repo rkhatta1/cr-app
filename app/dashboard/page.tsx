@@ -98,28 +98,29 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">My Videos</h1>
-            <div className="flex items-center gap-2">
-              <p className="text-muted-foreground">
-                Manage your generated content.
-              </p>
-              {/* 2. Visual indicator for the generation limit */}
-              <span className={`text-xs font-mono px-2 py-0.5 rounded-none border ${
-                isLimitReached ? 'border-primary text-primary animate-pulse' : 'border-zinc-800 text-zinc-500'
-              }`}>
-                {currentCount}/{generationLimit} GENERATIONS
-              </span>
-            </div>
+            <p className="text-muted-foreground">
+              Manage your generated content.
+            </p>
           </div>
-          
-          {/* 3. Disable the main action button if limit is reached */}
-          <Button 
-            onClick={() => router.push('/upload')}
-            disabled={isLimitReached}
-            className={isLimitReached ? 'opacity-50' : ''}
-          >
-            <HugeiconsIcon icon={Add01Icon} size={16} className="mr-2" />
-            {isLimitReached ? 'Limit Reached' : 'New Video'}
-          </Button>
+
+          <div className="flex items-center gap-3">
+            {/* Visual indicator for the generation limit */}
+            <span className={`text-xs font-mono px-3 py-2 rounded-lg border ${
+              isLimitReached ? 'border-primary text-primary' : 'border-zinc-800 text-zinc-500'
+            }`}>
+              {currentCount}/{generationLimit} GENERATIONS
+            </span>
+
+            {/* Main action button */}
+            <Button
+              onClick={() => router.push('/upload')}
+              disabled={isLimitReached}
+              className={isLimitReached ? 'opacity-50' : ''}
+            >
+              <HugeiconsIcon icon={Add01Icon} size={16} className="mr-2" />
+              {isLimitReached ? 'Limit Reached' : 'New Video'}
+            </Button>
+          </div>
         </div>
 
         {/* Grid */}
@@ -144,7 +145,7 @@ export default function DashboardPage() {
             <Card
               key={video.id}
               onClick={() => router.push(`/videos/${video.id}`)}
-              className="flex flex-col h-full group p-0 border-zinc-800 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden"
+              className="flex flex-col h-full group pt-0 gap-0 border-zinc-800 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden"
             >
               {/* Thumbnail Area */}
               <div className="relative aspect-video bg-zinc-900 border-b border-border overflow-hidden">
@@ -196,28 +197,30 @@ export default function DashboardPage() {
               </div>
 
               {/* Content Area */}
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
-                  <StatusBadge status={video.status} showText={false} />
-                  <button
-                    className="text-zinc-500 hover:text-red-500 transition-colors p-1"
-                    onClick={(e) => handleDelete(e, video.id)}
-                    title="Delete Video"
-                  >
-                    <HugeiconsIcon icon={Delete02Icon} size={18} />
-                  </button>
-                </div>
-
+              <div className="p-4 pb-0 m-0 flex-1 flex justify-between flex-row">
+                
+                <div className='flex flex-col gap-1'>
                 <h3
-                  className="text-white font-medium truncate mb-1"
+                  className="text-white font-medium truncate"
                   title={video.filename}
                 >
                   {video.filename}
                 </h3>
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto">
-                  <HugeiconsIcon icon={Clock01Icon} size={12} />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>{formatDate(video.created_at)}</span>
+                  <span>·</span>
+                  <StatusBadge status={video.status} showText={false} />
+                </div>
+                </div>
+                <div className="flex justify-end gap-3 items-center mb-0">
+                  <button
+                    className="text-zinc-500 hover:text-red-500 transition-colors p-0"
+                    onClick={(e) => handleDelete(e, video.id)}
+                    title="Delete Video"
+                  >
+                    <HugeiconsIcon icon={Delete02Icon} size={18} />
+                  </button>
                 </div>
               </div>
             </Card>
