@@ -17,15 +17,15 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, className, showText = true }: StatusBadgeProps) {
   const styles: Record<VideoStatus, string> = {
     [VideoStatus.UPLOADING]:
-      'bg-blue-500/10 text-blue-400 border-blue-500/20',
+      'text-blue-400',
     [VideoStatus.PENDING]:
-      'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+      'text-zinc-400',
     [VideoStatus.PROCESSING]:
-      'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      'text-amber-400',
     [VideoStatus.RENDERING]:
-      'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    [VideoStatus.COMPLETED]: 'bg-primary/10 text-primary border-primary/20',
-    [VideoStatus.FAILED]: 'bg-red-500/10 text-red-400 border-red-500/20',
+      'text-purple-400',
+    [VideoStatus.COMPLETED]: 'text-primary',
+    [VideoStatus.FAILED]: 'text-red-400',
   };
 
   const getIcon = (status: VideoStatus) => {
