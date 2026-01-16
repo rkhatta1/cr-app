@@ -27,7 +27,7 @@ export default function LandingPage() {
     const beforeVideo = document.createElement('video');
     const afterVideo = document.createElement('video');
 
-    beforeVideo.src = '/before.mov';
+    beforeVideo.src = '/before.mp4';
     afterVideo.src = '/after.mp4';
 
     beforeVideo.onloadeddata = () => {
@@ -40,6 +40,13 @@ export default function LandingPage() {
 
     beforeVideo.load();
     afterVideo.load();
+
+    // Timeout fallback - show page after 5 seconds regardless
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
